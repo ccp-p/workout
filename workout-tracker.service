@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/opt/workout-tracker/backend
-ExecStart=/usr/local/go/bin/go run main.go
+ExecStart=/opt/workout-tracker/backend/workout-tracker
 Restart=always
 RestartSec=10
 Environment=PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
