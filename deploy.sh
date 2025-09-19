@@ -3,7 +3,7 @@
 # 健身训练应用服务器部署脚本
 # 使用方法: ./deploy.sh [服务器IP] [用户名]
 
-SERVER_IP=${1:-"your-server-ip"}
+SERVER_IP=${1:-"8.134.32.71"}
 SERVER_USER=${2:-"root"}
 APP_NAME="workout-tracker"
 REMOTE_DIR="/opt/$APP_NAME"

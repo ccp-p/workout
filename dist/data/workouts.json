@@ -1,0 +1,194 @@
+[
+  {
+    "id": "workout-001",
+    "name": "上肢力量训练（哑铃）",
+    "description": "围绕哑铃的上肢力量训练，锻炼胸部、肩部、手臂和背部肌群",
+    "bodyPart": "上肢",
+    "exercises": [
+      {
+        "exerciseId": "ex-006",
+        "sets": 4,
+        "reps": 12,
+        "weight": 10,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-008",
+        "sets": 4,
+        "reps": 10,
+        "weight": 12,
+        "restTime": 75
+      },
+      {
+        "exerciseId": "ex-001",
+        "sets": 4,
+        "reps": 15,
+        "weight": 0,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-007",
+        "sets": 3,
+        "reps": 12,
+        "weight": 8,
+        "restTime": 45
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-002",
+    "name": "下肢力量训练（哑铃）",
+    "description": "使用哑铃加强下肢训练，提高腿部力量和稳定性",
+    "bodyPart": "下肢",
+    "exercises": [
+      {
+        "exerciseId": "ex-010",
+        "sets": 4,
+        "reps": 15,
+        "weight": 15,
+        "restTime": 75
+      },
+      {
+        "exerciseId": "ex-011",
+        "sets": 3,
+        "reps": 12,
+        "weight": 10,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-002",
+        "sets": 3,
+        "reps": 20,
+        "weight": 0,
+        "restTime": 45
+      },
+      {
+        "exerciseId": "ex-003",
+        "sets": 3,
+        "reps": 45,
+        "weight": 0,
+        "restTime": 60
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-003",
+    "name": "全身综合训练",
+    "description": "结合力量训练和有氧运动的全身综合训练计划",
+    "bodyPart": "全身",
+    "exercises": [
+      {
+        "exerciseId": "ex-009",
+        "sets": 3,
+        "reps": 100,
+        "weight": 0,
+        "restTime": 90
+      },
+      {
+        "exerciseId": "ex-006",
+        "sets": 3,
+        "reps": 10,
+        "weight": 12,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-010",
+        "sets": 3,
+        "reps": 12,
+        "weight": 12,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-001",
+        "sets": 3,
+        "reps": 12,
+        "weight": 0,
+        "restTime": 45
+      },
+      {
+        "exerciseId": "ex-008",
+        "sets": 3,
+        "reps": 10,
+        "weight": 10,
+        "restTime": 60
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-004",
+    "name": "有氧燃脂训练",
+    "description": "以跳绳为主的有氧训练，结合基础力量动作，提高心肺功能",
+    "bodyPart": "全身",
+    "exercises": [
+      {
+        "exerciseId": "ex-009",
+        "sets": 4,
+        "reps": 400,
+        "weight": 0,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-002",
+        "sets": 3,
+        "reps": 15,
+        "weight": 0,
+        "restTime": 30
+      },
+      {
+        "exerciseId": "ex-001",
+        "sets": 3,
+        "reps": 10,
+        "weight": 0,
+        "restTime": 30
+      },
+      {
+        "exerciseId": "ex-003",
+        "sets": 2,
+        "reps": 30,
+        "weight": 0,
+        "restTime": 45
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-005",
+    "name": "核心强化训练",
+    "description": "专注核心肌群的训练计划，提高身体稳定性和平衡能力",
+    "bodyPart": "核心",
+    "exercises": [
+      {
+        "exerciseId": "ex-003",
+        "sets": 4,
+        "reps": 60,
+        "weight": 0,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-005",
+        "sets": 4,
+        "reps": 20,
+        "weight": 0,
+        "restTime": 45
+      },
+      {
+        "exerciseId": "ex-011",
+        "sets": 3,
+        "reps": 10,
+        "weight": 8,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-009",
+        "sets": 2,
+        "reps": 100,
+        "weight": 0,
+        "restTime": 90
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  }
+]

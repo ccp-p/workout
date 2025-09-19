@@ -1,0 +1,127 @@
+[
+  {
+    "id": "58322a5e-a44d-430a-8d9a-b34caa44d1ab",
+    "workoutId": "workout-001",
+    "date": "2025-09-19T18:58:50.9199415+08:00",
+    "startTime": "2025-09-19T18:58:50.9199415+08:00",
+    "endTime": "0001-01-01T00:00:00Z",
+    "totalTime": 0,
+    "exercises": [
+      {
+        "exerciseId": "ex-001",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-004",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-003",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      }
+    ],
+    "notes": "",
+    "isCompleted": false
+  },
+  {
+    "id": "34f8476a-a7d3-4da2-a357-d14edccec0ef",
+    "workoutId": "workout-001",
+    "date": "2025-09-19T18:59:05.3420205+08:00",
+    "startTime": "2025-09-19T18:59:05.3420205+08:00",
+    "endTime": "0001-01-01T00:00:00Z",
+    "totalTime": 0,
+    "exercises": [
+      {
+        "exerciseId": "ex-001",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-004",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-003",
+        "completedSets": 0,
+        "completedReps": [],
+        "actualRestTimes": [],
+        "isCompleted": false
+      }
+    ],
+    "notes": "",
+    "isCompleted": false
+  },
+  {
+    "id": "76ee4a9d-83e2-4a67-970a-1ad10b75e37f",
+    "workoutId": "workout-001",
+    "date": "2025-09-19T19:03:19.1670915+08:00",
+    "startTime": "2025-09-19T19:03:19.1670915+08:00",
+    "endTime": "0001-01-01T00:00:00Z",
+    "totalTime": 0,
+    "exercises": [
+      {
+        "exerciseId": "ex-001",
+        "completedSets": 1,
+        "completedReps": [
+          12,
+          0,
+          0,
+          0
+        ],
+        "actualRestTimes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-004",
+        "completedSets": 0,
+        "completedReps": [
+          0,
+          0,
+          0
+        ],
+        "actualRestTimes": [
+          0,
+          0,
+          0
+        ],
+        "isCompleted": false
+      },
+      {
+        "exerciseId": "ex-003",
+        "completedSets": 0,
+        "completedReps": [
+          0,
+          0,
+          0
+        ],
+        "actualRestTimes": [
+          0,
+          0,
+          0
+        ],
+        "isCompleted": false
+      }
+    ],
+    "notes": "",
+    "isCompleted": false
+  }
+]

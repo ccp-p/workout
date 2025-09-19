@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身训练管理后台</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #fff;
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: #007aff;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f0f0f0;
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+        }
+
+        .btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #0056d3;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+        }
+
+        .btn-danger:hover {
+            background: #d70015;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .exercise-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+
+        .exercise-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .exercise-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-bodypart {
+            color: #8e8e93;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-description {
+            color: #48484a;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .workout-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .workout-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-set {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .file-upload {
+            border: 2px dashed #d1d1d6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .file-upload.dragover {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 图表样式 */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .chart-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* 训练日历样式 */
+        .calendar-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .training-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .calendar-day {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .calendar-day.has-workout {
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #007aff;
+            background: #e3f2fd;
+        }
+
+        .day-date {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .day-info {
+            font-size: 0.8rem;
+        }
+
+        .workout-count {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .calories {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* 最近训练记录样式 */
+        .recent-workouts {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .workout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .workout-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .workout-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .workout-date {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .workout-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .workout-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .workout-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: #ffc107;
+            color: #333;
+        }
+
+        .workout-status.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .exercise-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .training-calendar {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 0.2rem;
+            }
+
+            .calendar-day {
+                min-height: 60px;
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .workout-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>健身训练管理后台</h1>
+        </div>
+
+        <div class="container">
+            <div class="tabs">
+                <div class="tab" :class="{active: activeTab === 'exercises'}" @click="activeTab = 'exercises'">
+                    动作管理
+                </div>
+                <div class="tab" :class="{active: activeTab === 'workouts'}" @click="activeTab = 'workouts'">
+                    训练计划
+                </div>
+                <div class="tab" :class="{active: activeTab === 'sessions'}" @click="activeTab = 'sessions'">
+                    训练记录
+                </div>
+                <div class="tab" :class="{active: activeTab === 'statistics'}" @click="activeTab = 'statistics'">
+                    数据统计
+                </div>
+            </div>
+
+            <!-- 动作管理 -->
+            <div v-show="activeTab === 'exercises'">
+                <div class="section">
+                    <h2>动作管理</h2>
+                    <button class="btn" @click="showAddExerciseModal = true">添加新动作</button>
+                </div>
+
+                <div class="exercise-grid">
+                    <div v-for="exercise in exercises" :key="exercise.id" class="exercise-card">
+                        <img v-if="exercise.imageUrl" :src="exercise.imageUrl" :alt="exercise.name" class="exercise-image">
+                        <div v-else class="exercise-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #8e8e93;">
+                            暂无图片
+                        </div>
+                        <div class="exercise-name">{{ exercise.name }}</div>
+                        <div class="exercise-bodypart">{{ exercise.bodyPart }}</div>
+                        <div class="exercise-description">{{ exercise.description }}</div>
+                        <div class="card-actions">
+                            <button class="btn" @click="editExercise(exercise)">编辑</button>
+                            <button class="btn btn-danger" @click="deleteExercise(exercise.id)">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练计划 -->
+            <div v-show="activeTab === 'workouts'">
+                <div class="section">
+                    <h2>训练计划</h2>
+                    <button class="btn" @click="showAddWorkoutModal = true">创建新计划</button>
+                </div>
+
+                <div v-for="workout in workouts" :key="workout.id" class="workout-item">
+                    <div class="workout-name">{{ workout.name }}</div>
+                    <div style="color: #8e8e93; margin-bottom: 1rem;">{{ workout.bodyPart }} - {{ workout.description }}</div>
+                    <div v-for="exercise in workout.exercises" :key="exercise.exerciseId" class="exercise-set">
+                        <span>{{ getExerciseName(exercise.exerciseId) }}</span>
+                        <span>{{ exercise.sets }}组 x {{ exercise.reps }}次</span>
+                        <span v-if="exercise.weight">{{ exercise.weight }}kg</span>
+                        <span>休息{{ exercise.restTime }}s</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn" @click="editWorkout(workout)">编辑</button>
+                        <button class="btn btn-danger" @click="deleteWorkout(workout.id)">删除</button>
+                        <button class="btn" @click="startWorkout(workout)">开始训练</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练记录 -->
+            <div v-show="activeTab === 'sessions'">
+                <div class="section">
+                    <h2>训练记录</h2>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="date" v-model="filterStartDate" class="form-control" style="width: auto;">
+                        <input type="date" v-model="filterEndDate" class="form-control" style="width: auto;">
+                        <button class="btn" @click="filterSessions">筛选</button>
+                    </div>
+                </div>
+
+                <div v-for="session in sessions" :key="session.id" class="workout-item">
+                    <div class="workout-name">{{ getWorkoutName(session.workoutId) }}</div>
+                    <div style="color: #8e8e93; margin-bottom: 1rem;">
+                        {{ formatDate(session.date) }} | 
+                        {{ formatTime(session.startTime) }} - {{ formatTime(session.endTime) }} |
+                        总时长: {{ formatDuration(session.totalTime) }}
+                    </div>
+                    <div v-if="session.isCompleted" style="color: #34c759; font-weight: 600;">✓ 已完成</div>
+                    <div v-else style="color: #ff9500; font-weight: 600;">进行中</div>
+                </div>
+            </div>
+
+            <!-- 数据统计 -->
+            <div v-show="activeTab === 'statistics'">
+                <div class="section">
+                    <h2>📊 数据统计分析</h2>
+                </div>
+
+                <!-- 概览卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card highlight">
+                        <div class="stat-value">{{ statistics.todayStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">今日训练次数</div>
+                        <div class="stat-icon">🏋️‍♂️</div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-value">{{ formatDuration(statistics.todayStats?.totalTime || 0) }}</div>
+                        <div class="stat-label">今日训练时长</div>
+                        <div class="stat-icon">⏱️</div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-value">{{ Math.round(statistics.todayStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">今日消耗卡路里</div>
+                        <div class="stat-icon">🔥</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.weekStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">本周训练次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ Math.round(statistics.weekStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">本周消耗卡路里</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.monthStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">本月训练次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ Math.round(statistics.monthStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">本月消耗卡路里</div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="charts-container">
+                    <div class="chart-section">
+                        <h3>📈 卡路里消耗趋势（最近7天）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="caloriesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3>⏰ 训练时长统计（最近7天）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="durationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3>🎯 动作分布</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="exerciseChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3>💪 身体部位训练比例</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="bodyPartChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 训练日历 -->
+                <div class="calendar-section">
+                    <h3>📅 训练日历</h3>
+                    <div class="training-calendar">
+                        <div v-for="day in recentDays" :key="day.date" class="calendar-day" 
+                             :class="{ 'has-workout': day.hasWorkout, 'today': day.isToday }">
+                            <div class="day-date">{{ day.displayDate }}</div>
+                            <div class="day-info" v-if="day.hasWorkout">
+                                <div class="workout-count">{{ day.workoutCount }}次</div>
+                                <div class="calories">{{ Math.round(day.totalCalories) }}卡</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近训练记录 -->
+                <div class="recent-workouts">
+                    <h3>🏃‍♂️ 最近训练记录</h3>
+                    <div class="workout-list">
+                        <div v-for="session in recentSessions" :key="session.id" class="workout-item">
+                            <div class="workout-date">{{ formatDate(session.date) }}</div>
+                            <div class="workout-name">{{ getWorkoutName(session.workoutId) }}</div>
+                            <div class="workout-stats">
+                                <span class="duration">{{ formatDuration(session.totalTime) }}</span>
+                                <span class="calories">{{ Math.round(session.totalCalories || 0) }}卡</span>
+                            </div>
+                            <div class="workout-status" :class="{ completed: session.isCompleted }">
+                                {{ session.isCompleted ? '✅ 已完成' : '⏸️ 未完成' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑动作模态框 -->
+        <div v-if="showAddExerciseModal || showEditExerciseModal" class="modal" @click.self="closeExerciseModal">
+            <div class="modal-content">
+                <h2>{{ showEditExerciseModal ? '编辑动作' : '添加新动作' }}</h2>
+                
+                <div class="form-group">
+                    <label>动作名称</label>
+                    <input type="text" v-model="exerciseForm.name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>身体部位</label>
+                    <select v-model="exerciseForm.bodyPart" class="form-control">
+                        <option value="">请选择</option>
+                        <option value="胸部">胸部</option>
+                        <option value="背部">背部</option>
+                        <option value="腿部">腿部</option>
+                        <option value="肩部">肩部</option>
+                        <option value="手臂">手臂</option>
+                        <option value="腹部">腹部</option>
+                        <option value="全身">全身</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>动作描述</label>
+                    <textarea v-model="exerciseForm.description" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>动作图片/GIF</label>
+                    <div class="file-upload" @click="$refs.fileInput.click()" 
+                         @dragover.prevent="onDragOver" 
+                         @dragleave.prevent="onDragLeave" 
+                         @drop.prevent="onDrop">
+                        <div v-if="exerciseForm.imageUrl">
+                            <img :src="exerciseForm.imageUrl" style="max-width: 200px; max-height: 200px;">
+                            <p>点击或拖拽更换图片</p>
+                        </div>
+                        <div v-else>
+                            <p>点击选择或拖拽文件到此处上传</p>
+                            <p style="color: #8e8e93; font-size: 0.9rem;">支持 JPG, PNG, GIF 格式</p>
+                        </div>
+                    </div>
+                    <input ref="fileInput" type="file" @change="onFileSelect" accept="image/*" class="hidden">
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn" style="background: #8e8e93;" @click="closeExerciseModal">取消</button>
+                    <button class="btn" @click="saveExercise">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑训练计划模态框 -->
+        <div v-if="showAddWorkoutModal || showEditWorkoutModal" class="modal" @click.self="closeWorkoutModal">
+            <div class="modal-content">
+                <h2>{{ showEditWorkoutModal ? '编辑训练计划' : '创建新训练计划' }}</h2>
+                
+                <div class="form-group">
+                    <label>计划名称</label>
+                    <input type="text" v-model="workoutForm.name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>目标部位</label>
+                    <select v-model="workoutForm.bodyPart" class="form-control">
+                        <option value="">请选择</option>
+                        <option value="胸部">胸部</option>
+                        <option value="背部">背部</option>
+                        <option value="腿部">腿部</option>
+                        <option value="肩部">肩部</option>
+                        <option value="手臂">手臂</option>
+                        <option value="腹部">腹部</option>
+                        <option value="全身">全身</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>计划描述</label>
+                    <textarea v-model="workoutForm.description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>训练动作</label>
+                    <div v-for="(exercise, index) in workoutForm.exercises" :key="index" class="exercise-set">
+                        <select v-model="exercise.exerciseId" class="form-control" style="width: auto;">
+                            <option value="">选择动作</option>
+                            <option v-for="ex in exercises" :key="ex.id" :value="ex.id">{{ ex.name }}</option>
+                        </select>
+                        <input type="number" v-model="exercise.sets" placeholder="组数" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.reps" placeholder="次数" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.weight" placeholder="重量" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.restTime" placeholder="休息(秒)" class="form-control" style="width: 100px;">
+                        <button class="btn btn-danger" @click="removeExerciseFromWorkout(index)">删除</button>
+                    </div>
+                    <button class="btn" @click="addExerciseToWorkout">添加动作</button>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn" style="background: #8e8e93;" @click="closeWorkoutModal">取消</button>
+                    <button class="btn" @click="saveWorkout">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'exercises',
+                    exercises: [],
+                    workouts: [],
+                    sessions: [],
+                    statistics: {},
+                    
+                    // 图表实例
+                    charts: {
+                        calories: null,
+                        duration: null,
+                        exercise: null,
+                        bodyPart: null
+                    },
+                    
+                    // 日历和最近记录数据
+                    recentDays: [],
+                    recentSessions: [],
+                    
+                    // 模态框状态
+                    showAddExerciseModal: false,
+                    showEditExerciseModal: false,
+                    showAddWorkoutModal: false,
+                    showEditWorkoutModal: false,
+                    
+                    // 表单数据
+                    exerciseForm: {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        imageUrl: ''
+                    },
+                    workoutForm: {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        exercises: []
+                    },
+                    
+                    // 筛选
+                    filterStartDate: '',
+                    filterEndDate: ''
+                }
+            },
+            
+            computed: {
+                // 格式化时长显示
+                formatDuration() {
+                    return (seconds) => {
+                        if (!seconds) return '0分钟';
+                        const minutes = Math.floor(seconds / 60);
+                        const remainingSeconds = seconds % 60;
+                        if (minutes > 0) {
+                            return remainingSeconds > 0 ? `${minutes}分${remainingSeconds}秒` : `${minutes}分钟`;
+                        }
+                        return `${remainingSeconds}秒`;
+                    };
+                },
+                
+                // 格式化日期显示
+                formatDate() {
+                    return (dateString) => {
+                        const date = new Date(dateString);
+                        const now = new Date();
+                        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDays === 0) return '今天';
+                        if (diffDays === 1) return '昨天';
+                        if (diffDays < 7) return `${diffDays}天前`;
+                        return date.toLocaleDateString('zh-CN');
+                    };
+                }
+            },
+            
+            methods: {
+                async loadExercises() {
+                    try {
+                        const response = await axios.get('/api/exercises');
+                        this.exercises = response.data || [];
+                    } catch (error) {
+                        console.error('加载动作失败:', error);
+                    }
+                },
+                
+                async loadWorkouts() {
+                    try {
+                        const response = await axios.get('/api/workouts');
+                        this.workouts = response.data || [];
+                    } catch (error) {
+                        console.error('加载训练计划失败:', error);
+                    }
+                },
+                
+                async loadSessions() {
+                    try {
+                        const response = await axios.get('/api/sessions');
+                        this.sessions = response.data || [];
+                    } catch (error) {
+                        console.error('加载训练记录失败:', error);
+                    }
+                },
+                
+                async loadStatistics() {
+                    try {
+                        const response = await axios.get('/api/statistics');
+                        this.statistics = response.data || {};
+                        
+                        // 加载完统计数据后初始化图表和日历数据
+                        this.$nextTick(() => {
+                            this.initializeCharts();
+                            this.generateRecentDays();
+                            this.loadRecentSessions();
+                        });
+                    } catch (error) {
+                        console.error('加载统计数据失败:', error);
+                    }
+                },
+                
+                // 初始化所有图表
+                initializeCharts() {
+                    this.initCaloriesChart();
+                    this.initDurationChart();
+                    this.initExerciseChart();
+                    this.initBodyPartChart();
+                },
+                
+                // 卡路里趋势图
+                initCaloriesChart() {
+                    const ctx = document.getElementById('caloriesChart');
+                    if (!ctx) return;
+                    
+                    if (this.charts.calories) {
+                        this.charts.calories.destroy();
+                    }
+                    
+                    // 生成最近7天的数据
+                    const last7Days = this.getLast7DaysData();
+                    
+                    this.charts.calories = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: last7Days.map(day => day.label),
+                            datasets: [{
+                                label: '消耗卡路里',
+                                data: last7Days.map(day => day.calories),
+                                borderColor: '#ff6b6b',
+                                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                // 训练时长图表
+                initDurationChart() {
+                    const ctx = document.getElementById('durationChart');
+                    if (!ctx) return;
+                    
+                    if (this.charts.duration) {
+                        this.charts.duration.destroy();
+                    }
+                    
+                    const last7Days = this.getLast7DaysData();
+                    
+                    this.charts.duration = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: last7Days.map(day => day.label),
+                            datasets: [{
+                                label: '训练时长(分钟)',
+                                data: last7Days.map(day => Math.round(day.duration / 60)),
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                // 动作分布饼图
+                initExerciseChart() {
+                    const ctx = document.getElementById('exerciseChart');
+                    if (!ctx) return;
+                    
+                    if (this.charts.exercise) {
+                        this.charts.exercise.destroy();
+                    }
+                    
+                    const exerciseStats = this.getExerciseStats();
+                    
+                    this.charts.exercise = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: exerciseStats.labels,
+                            datasets: [{
+                                data: exerciseStats.data,
+                                backgroundColor: [
+                                    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+                                    '#ffeaa7', '#dda0dd', '#98d8c8', '#f7dc6f'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                // 身体部位训练比例
+                initBodyPartChart() {
+                    const ctx = document.getElementById('bodyPartChart');
+                    if (!ctx) return;
+                    
+                    if (this.charts.bodyPart) {
+                        this.charts.bodyPart.destroy();
+                    }
+                    
+                    const bodyPartStats = this.getBodyPartStats();
+                    
+                    this.charts.bodyPart = new Chart(ctx, {
+                        type: 'polarArea',
+                        data: {
+                            labels: bodyPartStats.labels,
+                            datasets: [{
+                                data: bodyPartStats.data,
+                                backgroundColor: [
+                                    'rgba(255, 107, 107, 0.8)',
+                                    'rgba(78, 205, 196, 0.8)',
+                                    'rgba(69, 183, 209, 0.8)',
+                                    'rgba(150, 206, 180, 0.8)',
+                                    'rgba(255, 234, 167, 0.8)',
+                                    'rgba(221, 160, 221, 0.8)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                // 获取最近7天的数据
+                getLast7DaysData() {
+                    const days = [];
+                    for (let i = 6; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        const dateStr = date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+                        
+                        // 从sessions中获取该天的数据
+                        const daySessions = this.sessions.filter(session => {
+                            const sessionDate = new Date(session.date);
+                            return sessionDate.toDateString() === date.toDateString();
+                        });
+                        
+                        const calories = daySessions.reduce((sum, session) => sum + (session.totalCalories || 0), 0);
+                        const duration = daySessions.reduce((sum, session) => sum + (session.totalTime || 0), 0);
+                        
+                        days.push({
+                            label: dateStr,
+                            calories: Math.round(calories),
+                            duration: duration,
+                            workouts: daySessions.length
+                        });
+                    }
+                    return days;
+                },
+                
+                // 获取动作统计
+                getExerciseStats() {
+                    const exerciseCount = {};
+                    
+                    this.sessions.forEach(session => {
+                        session.exercises?.forEach(sessionEx => {
+                            const exercise = this.exercises.find(ex => ex.id === sessionEx.exerciseId);
+                            if (exercise && sessionEx.isCompleted) {
+                                exerciseCount[exercise.name] = (exerciseCount[exercise.name] || 0) + 1;
+                            }
+                        });
+                    });
+                    
+                    const sortedExercises = Object.entries(exerciseCount)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 8); // 只显示前8个
+                    
+                    return {
+                        labels: sortedExercises.map(([name]) => name),
+                        data: sortedExercises.map(([,count]) => count)
+                    };
+                },
+                
+                // 获取身体部位统计
+                getBodyPartStats() {
+                    const bodyPartCount = {};
+                    
+                    this.sessions.forEach(session => {
+                        session.exercises?.forEach(sessionEx => {
+                            const exercise = this.exercises.find(ex => ex.id === sessionEx.exerciseId);
+                            if (exercise && sessionEx.isCompleted) {
+                                bodyPartCount[exercise.bodyPart] = (bodyPartCount[exercise.bodyPart] || 0) + 1;
+                            }
+                        });
+                    });
+                    
+                    return {
+                        labels: Object.keys(bodyPartCount),
+                        data: Object.values(bodyPartCount)
+                    };
+                },
+                
+                // 生成最近训练日历
+                generateRecentDays() {
+                    const days = [];
+                    for (let i = 13; i >= 0; i--) { // 显示最近14天
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        
+                        const daySessions = this.sessions.filter(session => {
+                            const sessionDate = new Date(session.date);
+                            return sessionDate.toDateString() === date.toDateString();
+                        });
+                        
+                        const totalCalories = daySessions.reduce((sum, session) => sum + (session.totalCalories || 0), 0);
+                        
+                        days.push({
+                            date: date.toISOString(),
+                            displayDate: date.getDate(),
+                            hasWorkout: daySessions.length > 0,
+                            workoutCount: daySessions.length,
+                            totalCalories: totalCalories,
+                            isToday: date.toDateString() === new Date().toDateString()
+                        });
+                    }
+                    this.recentDays = days;
+                },
+                
+                // 加载最近训练记录
+                loadRecentSessions() {
+                    this.recentSessions = this.sessions
+                        .filter(session => session.isCompleted)
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .slice(0, 10); // 只显示最近10条记录
+                },
+                
+                // 根据workoutId获取训练计划名称
+                getWorkoutName(workoutId) {
+                    const workout = this.workouts.find(w => w.id === workoutId);
+                    return workout ? workout.name : '未知训练';
+                },
+                
+                // 动作相关方法
+                editExercise(exercise) {
+                    this.exerciseForm = { ...exercise };
+                    this.showEditExerciseModal = true;
+                },
+                
+                async deleteExercise(id) {
+                    if (confirm('确定要删除这个动作吗？')) {
+                        try {
+                            await axios.delete(`/api/exercises/${id}`);
+                            await this.loadExercises();
+                        } catch (error) {
+                            alert('删除失败: ' + error.response?.data?.error);
+                        }
+                    }
+                },
+                
+                async saveExercise() {
+                    try {
+                        if (this.showEditExerciseModal) {
+                            await axios.put(`/api/exercises/${this.exerciseForm.id}`, this.exerciseForm);
+                        } else {
+                            await axios.post('/api/exercises', this.exerciseForm);
+                        }
+                        await this.loadExercises();
+                        this.closeExerciseModal();
+                    } catch (error) {
+                        alert('保存失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                closeExerciseModal() {
+                    this.showAddExerciseModal = false;
+                    this.showEditExerciseModal = false;
+                    this.exerciseForm = {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        imageUrl: ''
+                    };
+                },
+                
+                // 训练计划相关方法
+                editWorkout(workout) {
+                    this.workoutForm = { ...workout };
+                    this.showEditWorkoutModal = true;
+                },
+                
+                async deleteWorkout(id) {
+                    if (confirm('确定要删除这个训练计划吗？')) {
+                        try {
+                            await axios.delete(`/api/workouts/${id}`);
+                            await this.loadWorkouts();
+                        } catch (error) {
+                            alert('删除失败: ' + error.response?.data?.error);
+                        }
+                    }
+                },
+                
+                async saveWorkout() {
+                    try {
+                        if (this.showEditWorkoutModal) {
+                            await axios.put(`/api/workouts/${this.workoutForm.id}`, this.workoutForm);
+                        } else {
+                            await axios.post('/api/workouts', this.workoutForm);
+                        }
+                        await this.loadWorkouts();
+                        this.closeWorkoutModal();
+                    } catch (error) {
+                        alert('保存失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                closeWorkoutModal() {
+                    this.showAddWorkoutModal = false;
+                    this.showEditWorkoutModal = false;
+                    this.workoutForm = {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        exercises: []
+                    };
+                },
+                
+                addExerciseToWorkout() {
+                    this.workoutForm.exercises.push({
+                        exerciseId: '',
+                        sets: 4,
+                        reps: 12,
+                        weight: 0,
+                        restTime: 60
+                    });
+                },
+                
+                removeExerciseFromWorkout(index) {
+                    this.workoutForm.exercises.splice(index, 1);
+                },
+                
+                async startWorkout(workout) {
+                    try {
+                        const session = {
+                            workoutId: workout.id,
+                            exercises: workout.exercises.map(ex => ({
+                                exerciseId: ex.exerciseId,
+                                completedSets: 0,
+                                completedReps: [],
+                                actualRestTimes: [],
+                                isCompleted: false
+                            })),
+                            isCompleted: false
+                        };
+                        
+                        const response = await axios.post('/api/sessions', session);
+                        const sessionId = response.data.id;
+                        
+                        // 跳转到移动端训练页面
+                        window.open(`/mobile?session=${sessionId}`, '_blank');
+                    } catch (error) {
+                        alert('启动训练失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                // 文件上传相关方法
+                async onFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        await this.uploadFile(file);
+                    }
+                },
+                
+                onDragOver(event) {
+                    event.dataTransfer.dropEffect = 'copy';
+                    event.target.classList.add('dragover');
+                },
+                
+                onDragLeave(event) {
+                    event.target.classList.remove('dragover');
+                },
+                
+                async onDrop(event) {
+                    event.target.classList.remove('dragover');
+                    const file = event.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        await this.uploadFile(file);
+                    }
+                },
+                
+                async uploadFile(file) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await axios.post('/api/upload', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+                        
+                        this.exerciseForm.imageUrl = response.data.url;
+                    } catch (error) {
+                        alert('文件上传失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                // 工具方法
+                getExerciseName(exerciseId) {
+                    const exercise = this.exercises.find(ex => ex.id === exerciseId);
+                    return exercise ? exercise.name : '未知动作';
+                },
+                
+                getWorkoutName(workoutId) {
+                    const workout = this.workouts.find(w => w.id === workoutId);
+                    return workout ? workout.name : '未知计划';
+                },
+                
+                formatDate(dateString) {
+                    return new Date(dateString).toLocaleDateString('zh-CN');
+                },
+                
+                formatTime(timeString) {
+                    return new Date(timeString).toLocaleTimeString('zh-CN');
+                },
+                
+                formatDuration(seconds) {
+                    if (!seconds) return '0s';
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = seconds % 60;
+                    
+                    if (hours > 0) {
+                        return `${hours}h ${minutes}m ${secs}s`;
+                    } else if (minutes > 0) {
+                        return `${minutes}m ${secs}s`;
+                    }
+                    return `${secs}s`;
+                },
+                
+                async filterSessions() {
+                    try {
+                        let url = '/api/sessions';
+                        if (this.filterStartDate && this.filterEndDate) {
+                            url += `?start=${this.filterStartDate}&end=${this.filterEndDate}`;
+                        }
+                        const response = await axios.get(url);
+                        this.sessions = response.data || [];
+                    } catch (error) {
+                        console.error('筛选训练记录失败:', error);
+                    }
+                }
+            },
+            
+            watch: {
+                activeTab(newTab) {
+                    if (newTab === 'statistics') {
+                        // 延迟执行确保DOM已更新
+                        this.$nextTick(() => {
+                            this.initializeCharts();
+                            this.generateRecentDays();
+                            this.loadRecentSessions();
+                        });
+                    }
+                }
+            },
+            
+            async mounted() {
+                await this.loadExercises();
+                await this.loadWorkouts();
+                await this.loadSessions();
+                await this.loadStatistics();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

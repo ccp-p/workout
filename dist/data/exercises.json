@@ -1,0 +1,102 @@
+[
+  {
+    "id": "ex-001",
+    "name": "俯卧撑",
+    "description": "经典的上肢力量训练动作，主要锻炼胸肌、三角肌和肱三头肌。保持身体呈一条直线，慢慢下降至胸部接近地面，然后推起身体回到起始位置。",
+    "imageUrl": "",
+    "bodyPart": "胸部",
+    "caloriesPerRep": 0.5,
+    "caloriesPerMinute": 8,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-002",
+    "name": "深蹲",
+    "description": "下肢力量训练的王牌动作，主要锻炼股四头肌、臀大肌和核心肌群。双脚与肩同宽，蹲下时膝盖不超过脚尖，保持背部挺直。",
+    "imageUrl": "",
+    "bodyPart": "腿部",
+    "caloriesPerRep": 0.7,
+    "caloriesPerMinute": 10,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-003",
+    "name": "平板支撑",
+    "description": "核心力量训练动作，锻炼腹肌、背肌和肩部稳定性。身体呈一条直线，用前臂和脚尖支撑身体，保持稳定不晃动。",
+    "imageUrl": "",
+    "bodyPart": "腹部",
+    "caloriesPerRep": 0,
+    "caloriesPerMinute": 5,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-005",
+    "name": "卷腹",
+    "description": "腹肌训练的基础动作，主要锻炼腹直肌。仰卧，双手抱头，收缩腹肌将上身向膝盖方向卷起。",
+    "imageUrl": "",
+    "bodyPart": "腹部",
+    "caloriesPerRep": 0.3,
+    "caloriesPerMinute": 6,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-006",
+    "name": "哑铃推举",
+    "description": "站立或坐姿，双手各持一只哑铃，从肩部推举至头顶，主要锻炼三角肌前束、中束和肱三头肌。动作要控制，避免用力过猛。",
+    "imageUrl": "",
+    "bodyPart": "肩部",
+    "caloriesPerRep": 0.8,
+    "caloriesPerMinute": 9,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-007",
+    "name": "哑铃锤举",
+    "description": "双手各持一只哑铃，掌心相对，保持上臂不动，弯曲肘关节将哑铃举至肩部。主要锻炼肱二头肌和前臂肌群。",
+    "imageUrl": "",
+    "bodyPart": "手臂",
+    "caloriesPerRep": 0.4,
+    "caloriesPerMinute": 6,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-008",
+    "name": "哑铃划船",
+    "description": "俯身或单臂支撑，将哑铃从下方拉至腰部，主要锻炼背阔肌、菱形肌和后三角肌。保持背部挺直，收紧核心。",
+    "imageUrl": "",
+    "bodyPart": "背部",
+    "caloriesPerRep": 0.6,
+    "caloriesPerMinute": 8,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-009",
+    "name": "跳绳",
+    "description": "经典的有氧运动，提高心肺功能，燃烧脂肪，增强协调性。保持轻松的跳跃节奏，前脚掌着地，膝盖微屈。",
+    "imageUrl": "",
+    "bodyPart": "全身",
+    "caloriesPerRep": 0.1,
+    "caloriesPerMinute": 12,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-010",
+    "name": "哑铃深蹲",
+    "description": "双手各持一只哑铃，放在肩部或身体两侧，进行深蹲动作。增加下肢训练强度，锻炼股四头肌、臀大肌和核心。",
+    "imageUrl": "",
+    "bodyPart": "腿部",
+    "caloriesPerRep": 1.0,
+    "caloriesPerMinute": 12,
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "ex-011",
+    "name": "哑铃弓步蹲",
+    "description": "双手各持哑铃，一脚向前迈步下蹲，前后腿呈90度，然后回到起始位置。主要锻炼股四头肌、臀大肌和提高平衡能力。",
+    "imageUrl": "",
+    "bodyPart": "腿部",
+    "caloriesPerRep": 0.9,
+    "caloriesPerMinute": 11,
+    "createdAt": "2025-09-19T09:00:00Z"
+  }
+]
