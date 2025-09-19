@@ -1,0 +1,21 @@
+[Unit]
+Description=Workout Tracker Application
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/workout-tracker/backend
+ExecStart=/usr/local/go/bin/go run main.go
+Restart=always
+RestartSec=10
+Environment=PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=GIN_MODE=release
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=workout-tracker
+
+[Install]
+WantedBy=multi-user.target

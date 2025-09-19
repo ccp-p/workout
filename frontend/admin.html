@@ -395,12 +395,24 @@
                         <div class="stat-label">今日训练时长</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-value">{{ Math.round(statistics.todayStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">今日消耗卡路里</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-value">{{ statistics.weekStats?.workoutCount || 0 }}</div>
                         <div class="stat-label">本周训练次数</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-value">{{ Math.round(statistics.weekStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">本周消耗卡路里</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-value">{{ statistics.monthStats?.workoutCount || 0 }}</div>
                         <div class="stat-label">本月训练次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ Math.round(statistics.monthStats?.totalCalories || 0) }}</div>
+                        <div class="stat-label">本月消耗卡路里</div>
                     </div>
                 </div>
             </div>

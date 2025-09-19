@@ -398,6 +398,10 @@
                         <div class="stat-label">总训练时间</div>
                     </div>
                     <div class="stat-item">
+                        <div class="stat-value">{{ Math.round(totalCaloriesBurned) }}</div>
+                        <div class="stat-label">消耗卡路里</div>
+                    </div>
+                    <div class="stat-item">
                         <div class="stat-value">{{ completedExercises }}</div>
                         <div class="stat-label">完成动作</div>
                     </div>
@@ -545,6 +549,22 @@
                     return totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
                 },
                 
+                totalCaloriesBurned() {
+                    if (!this.exercises.length) return 0;
+                    return this.exercises.reduce((total, exercise) => {
+                        return total + exercise.sets.reduce((exerciseTotal, set) => {
+                            if (set.completed) {
+                                // 基于次数的卡路里计算
+                                const repCalories = (set.actualReps || 0) * exercise.caloriesPerRep;
+                                // 基于时间的卡路里计算（估算每组30秒）
+                                const timeCalories = (30 / 60) * exercise.caloriesPerMinute;
+                                return exerciseTotal + Math.max(repCalories, timeCalories);
+                            }
+                            return exerciseTotal;
+                        }, 0);
+                    }, 0);
+                },
+                
                 nextSetInfo() {
                     if (this.currentExerciseIndex < this.exercises.length) {
                         const exercise = this.exercises[this.currentExerciseIndex];
@@ -596,6 +616,8 @@
                                 id: workoutEx.exerciseId,
                                 name: exerciseInfo?.name || '未知动作',
                                 imageUrl: exerciseInfo?.imageUrl,
+                                caloriesPerRep: exerciseInfo?.caloriesPerRep || 0.5,
+                                caloriesPerMinute: exerciseInfo?.caloriesPerMinute || 8,
                                 sets: Array.from({ length: workoutEx.sets }, (_, i) => ({
                                     number: i + 1,
                                     completed: false,
