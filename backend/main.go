@@ -70,12 +70,18 @@ func main() {
 
 	// 移动端页面
 	r.GET("/mobile", func(c *gin.Context) {
-		c.Redirect(302, "/static/mobile.html")
+		// 保留查询参数
+		query := c.Request.URL.RawQuery
+		if query != "" {
+			c.Redirect(302, "/static/mobile.html?"+query)
+		} else {
+			c.Redirect(302, "/static/mobile.html")
+		}
 	})
 
-	log.Println("服务器启动在 http://localhost:8080")
-	log.Println("后台管理: http://localhost:8080")
-	log.Println("移动端训练: http://localhost:8080/mobile")
+	log.Println("服务器启动在 http://localhost:8769")
+	log.Println("后台管理: http://localhost:8769")
+	log.Println("移动端训练: http://localhost:8769/mobile")
 	
-	r.Run(":8080")
+	r.Run(":8769")
 }

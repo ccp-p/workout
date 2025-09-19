@@ -23,8 +23,8 @@ if errorlevel 1 (
 
 echo.
 echo 启动服务器...
-echo 后台管理: http://localhost:8080
-echo 移动端训练: http://localhost:8080/mobile
+echo 后台管理: http://localhost:8769
+echo 移动端训练: http://localhost:8769/mobile
 echo.
 echo 按 Ctrl+C 停止服务器
 echo.
