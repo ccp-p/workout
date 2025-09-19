@@ -1,0 +1,78 @@
+[
+  {
+    "id": "workout-001",
+    "name": "上身力量训练",
+    "description": "专注于上肢力量发展的综合训练计划",
+    "bodyPart": "胸部",
+    "exercises": [
+      {
+        "exerciseId": "ex-001",
+        "sets": 4,
+        "reps": 12,
+        "weight": 0,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-004",
+        "sets": 3,
+        "reps": 8,
+        "weight": 0,
+        "restTime": 90
+      },
+      {
+        "exerciseId": "ex-003",
+        "sets": 3,
+        "reps": 30,
+        "weight": 0,
+        "restTime": 45
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-002",
+    "name": "下身力量训练",
+    "description": "专注于下肢力量和稳定性的训练计划",
+    "bodyPart": "腿部",
+    "exercises": [
+      {
+        "exerciseId": "ex-002",
+        "sets": 4,
+        "reps": 15,
+        "weight": 0,
+        "restTime": 60
+      },
+      {
+        "exerciseId": "ex-003",
+        "sets": 3,
+        "reps": 45,
+        "weight": 0,
+        "restTime": 60
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  },
+  {
+    "id": "workout-003",
+    "name": "核心训练",
+    "description": "加强核心肌群的稳定性和力量",
+    "bodyPart": "腹部",
+    "exercises": [
+      {
+        "exerciseId": "ex-005",
+        "sets": 4,
+        "reps": 20,
+        "weight": 0,
+        "restTime": 30
+      },
+      {
+        "exerciseId": "ex-003",
+        "sets": 3,
+        "reps": 60,
+        "weight": 0,
+        "restTime": 45
+      }
+    ],
+    "createdAt": "2025-09-19T09:00:00Z"
+  }
+]

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>健身训练 - 移动端</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .workout-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .timer-section {
+            background: #1a1a1a;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #007aff;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .timer-btn:active {
+            transform: scale(0.95);
+        }
+
+        .timer-btn.pause {
+            background: #ff9500;
+        }
+
+        .timer-btn.stop {
+            background: #ff3b30;
+        }
+
+        .exercise-container {
+            padding: 1rem;
+        }
+
+        .exercise-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .exercise-card.current {
+            border-color: #007aff;
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .exercise-card.completed {
+            border-color: #34c759;
+            opacity: 0.7;
+        }
+
+        .exercise-header {
+            padding: 1rem;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .exercise-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #333;
+        }
+
+        .exercise-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .exercise-meta {
+            color: #8e8e93;
+            font-size: 0.9rem;
+        }
+
+        .exercise-content {
+            padding: 1rem;
+        }
+
+        .set-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .set-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .set-item.completed {
+            background: #34c759;
+            color: white;
+        }
+
+        .set-item.current {
+            background: #007aff;
+            color: white;
+        }
+
+        .set-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .set-number {
+            font-weight: 600;
+            width: 30px;
+        }
+
+        .set-details {
+            font-size: 0.9rem;
+        }
+
+        .set-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .set-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .set-btn:active {
+            transform: scale(0.95);
+        }
+
+        .set-btn.primary {
+            background: #007aff;
+        }
+
+        .set-btn.success {
+            background: #34c759;
+        }
+
+        .rest-timer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .rest-timer h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .rest-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #ff9500;
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .rest-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007aff, #64d2ff);
+            transition: width 0.3s ease;
+        }
+
+        .workout-summary {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem;
+            text-align: center;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            background: #2a2a2a;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007aff;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #8e8e93;
+            font-size: 0.9rem;
+        }
+
+        .finish-btn {
+            background: linear-gradient(135deg, #34c759, #30d158);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .finish-btn:active {
+            transform: scale(0.98);
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #007aff;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+            transition: all 0.2s;
+            z-index: 99;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 震动动画 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 2.5rem;
+            }
+            
+            .rest-display {
+                font-size: 3rem;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="app-container">
+            <!-- 头部 -->
+            <div class="header">
+                <h1>{{ currentWorkout?.name || '健身训练' }}</h1>
+                <div class="workout-info">{{ currentWorkout?.bodyPart }} | {{ completedExercises }}/{{ totalExercises }} 动作完成</div>
+            </div>
+
+            <!-- 总计时器 -->
+            <div class="timer-section">
+                <div class="timer-display">{{ formatTime(totalTime) }}</div>
+                <div class="timer-controls">
+                    <button class="timer-btn" @click="startWorkout" v-if="!isWorkoutStarted">开始训练</button>
+                    <button class="timer-btn pause" @click="pauseWorkout" v-else-if="!isPaused">暂停</button>
+                    <button class="timer-btn" @click="resumeWorkout" v-else>继续</button>
+                    <button class="timer-btn stop" @click="stopWorkout" v-if="isWorkoutStarted">结束</button>
+                </div>
+                
+                <!-- 进度条 -->
+                <div class="progress-bar">
+                    <div class="progress-fill" :style="{width: workoutProgress + '%'}"></div>
+                </div>
+            </div>
+
+            <!-- 训练完成总结 -->
+            <div v-if="isWorkoutCompleted" class="workout-summary">
+                <h2>🎉 训练完成！</h2>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ formatTime(totalTime) }}</div>
+                        <div class="stat-label">总训练时间</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ completedExercises }}</div>
+                        <div class="stat-label">完成动作</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ totalSetsCompleted }}</div>
+                        <div class="stat-label">完成组数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ totalRepsCompleted }}</div>
+                        <div class="stat-label">总次数</div>
+                    </div>
+                </div>
+                <button class="finish-btn" @click="finishWorkout">确认完成</button>
+            </div>
+
+            <!-- 动作列表 -->
+            <div v-else class="exercise-container">
+                <div v-for="(exercise, exerciseIndex) in exercises" 
+                     :key="exercise.id" 
+                     class="exercise-card"
+                     :class="{
+                         current: currentExerciseIndex === exerciseIndex,
+                         completed: exercise.isCompleted
+                     }">
+                     
+                    <div class="exercise-header">
+                        <img v-if="exercise.imageUrl" :src="exercise.imageUrl" :alt="exercise.name" class="exercise-image">
+                        <div v-else class="exercise-image"></div>
+                        <div class="exercise-info">
+                            <h3>{{ exercise.name }}</h3>
+                            <div class="exercise-meta">
+                                {{ exercise.sets }}组 x {{ exercise.reps }}次
+                                <span v-if="exercise.weight"> | {{ exercise.weight }}kg</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-content">
+                        <div class="set-list">
+                            <div v-for="(set, setIndex) in exercise.sets" 
+                                 :key="setIndex"
+                                 class="set-item"
+                                 :class="{
+                                     current: currentExerciseIndex === exerciseIndex && currentSetIndex === setIndex,
+                                     completed: set.completed
+                                 }">
+                                 
+                                <div class="set-info">
+                                    <div class="set-number">{{ setIndex + 1 }}</div>
+                                    <div class="set-details">
+                                        {{ exercise.reps }}次
+                                        <span v-if="exercise.weight"> | {{ exercise.weight }}kg</span>
+                                        <span v-if="set.actualReps"> | 实际: {{ set.actualReps }}次</span>
+                                    </div>
+                                </div>
+
+                                <div class="set-controls">
+                                    <button v-if="!set.completed && currentExerciseIndex === exerciseIndex" 
+                                            class="set-btn primary" 
+                                            @click="startSet(exerciseIndex, setIndex)">
+                                        开始
+                                    </button>
+                                    <button v-if="set.inProgress" 
+                                            class="set-btn success" 
+                                            @click="completeSet(exerciseIndex, setIndex)">
+                                        完成
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 浮动操作按钮 -->
+            <button class="fab" @click="showWorkoutActions" v-if="isWorkoutStarted && !isWorkoutCompleted">
+                ⚡
+            </button>
+        </div>
+
+        <!-- 组间休息计时器 -->
+        <div v-if="isResting" class="rest-timer">
+            <h2>组间休息</h2>
+            <div class="rest-display">{{ formatTime(restTimeRemaining) }}</div>
+            <div class="rest-controls">
+                <button class="timer-btn" @click="skipRest">跳过休息</button>
+                <button class="timer-btn" @click="addRestTime">+30s</button>
+            </div>
+            <div style="color: #8e8e93; margin-top: 1rem; text-align: center;">
+                下一组: {{ nextSetInfo }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    // 训练数据
+                    currentWorkout: null,
+                    currentSession: null,
+                    exercises: [],
+                    
+                    // 状态
+                    isWorkoutStarted: false,
+                    isPaused: false,
+                    isWorkoutCompleted: false,
+                    
+                    // 当前位置
+                    currentExerciseIndex: 0,
+                    currentSetIndex: 0,
+                    
+                    // 计时器
+                    totalTime: 0,
+                    workoutTimer: null,
+                    
+                    // 休息计时器
+                    isResting: false,
+                    restTimeRemaining: 0,
+                    restTimer: null,
+                    originalRestTime: 60,
+                    
+                    // 统计
+                    totalSetsCompleted: 0,
+                    totalRepsCompleted: 0
+                }
+            },
+            
+            computed: {
+                completedExercises() {
+                    return this.exercises.filter(ex => ex.isCompleted).length;
+                },
+                
+                totalExercises() {
+                    return this.exercises.length;
+                },
+                
+                workoutProgress() {
+                    if (!this.exercises.length) return 0;
+                    const totalSets = this.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+                    const completedSets = this.exercises.reduce((sum, ex) => 
+                        sum + ex.sets.filter(set => set.completed).length, 0);
+                    return totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
+                },
+                
+                nextSetInfo() {
+                    if (this.currentExerciseIndex < this.exercises.length) {
+                        const exercise = this.exercises[this.currentExerciseIndex];
+                        const setNum = this.currentSetIndex + 1;
+                        return `${exercise.name} 第${setNum}组`;
+                    }
+                    return '';
+                }
+            },
+            
+            methods: {
+                async loadWorkoutSession() {
+                    try {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const sessionId = urlParams.get('session');
+                        
+                        if (!sessionId) {
+                            alert('无效的训练会话');
+                            return;
+                        }
+                        
+                        // 加载训练会话
+                        const sessionResponse = await axios.get(`/api/sessions/${sessionId}`);
+                        this.currentSession = sessionResponse.data;
+                        
+                        // 加载训练计划
+                        const workoutResponse = await axios.get(`/api/workouts/${this.currentSession.workoutId}`);
+                        this.currentWorkout = workoutResponse.data;
+                        
+                        // 准备动作数据
+                        this.prepareExercises();
+                        
+                    } catch (error) {
+                        console.error('加载训练数据失败:', error);
+                        alert('加载训练数据失败');
+                    }
+                },
+                
+                async prepareExercises() {
+                    try {
+                        // 获取所有动作信息
+                        const exercisesResponse = await axios.get('/api/exercises');
+                        const allExercises = exercisesResponse.data;
+                        
+                        this.exercises = this.currentWorkout.exercises.map(workoutEx => {
+                            const exerciseInfo = allExercises.find(ex => ex.id === workoutEx.exerciseId);
+                            
+                            return {
+                                id: workoutEx.exerciseId,
+                                name: exerciseInfo?.name || '未知动作',
+                                imageUrl: exerciseInfo?.imageUrl,
+                                sets: Array.from({ length: workoutEx.sets }, (_, i) => ({
+                                    number: i + 1,
+                                    completed: false,
+                                    inProgress: false,
+                                    actualReps: 0,
+                                    actualRestTime: 0
+                                })),
+                                reps: workoutEx.reps,
+                                weight: workoutEx.weight,
+                                restTime: workoutEx.restTime,
+                                isCompleted: false
+                            };
+                        });
+                        
+                    } catch (error) {
+                        console.error('准备动作数据失败:', error);
+                    }
+                },
+                
+                startWorkout() {
+                    this.isWorkoutStarted = true;
+                    this.isPaused = false;
+                    this.startTimer();
+                    
+                    // 更新会话开始时间
+                    this.updateSession();
+                },
+                
+                pauseWorkout() {
+                    this.isPaused = true;
+                    this.stopTimer();
+                },
+                
+                resumeWorkout() {
+                    this.isPaused = false;
+                    this.startTimer();
+                },
+                
+                stopWorkout() {
+                    if (confirm('确定要结束训练吗？')) {
+                        this.isWorkoutStarted = false;
+                        this.stopTimer();
+                        this.completeWorkout();
+                    }
+                },
+                
+                startTimer() {
+                    this.workoutTimer = setInterval(() => {
+                        this.totalTime++;
+                    }, 1000);
+                },
+                
+                stopTimer() {
+                    if (this.workoutTimer) {
+                        clearInterval(this.workoutTimer);
+                        this.workoutTimer = null;
+                    }
+                },
+                
+                startSet(exerciseIndex, setIndex) {
+                    // 重置所有组的进行状态
+                    this.exercises.forEach(ex => {
+                        ex.sets.forEach(set => {
+                            set.inProgress = false;
+                        });
+                    });
+                    
+                    // 设置当前组为进行中
+                    this.exercises[exerciseIndex].sets[setIndex].inProgress = true;
+                    this.currentExerciseIndex = exerciseIndex;
+                    this.currentSetIndex = setIndex;
+                },
+                
+                completeSet(exerciseIndex, setIndex) {
+                    const exercise = this.exercises[exerciseIndex];
+                    const set = exercise.sets[setIndex];
+                    
+                    // 标记组完成
+                    set.completed = true;
+                    set.inProgress = false;
+                    set.actualReps = exercise.reps; // 简化处理，使用预设次数
+                    
+                    this.totalSetsCompleted++;
+                    this.totalRepsCompleted += set.actualReps;
+                    
+                    // 检查动作是否完成
+                    if (exercise.sets.every(s => s.completed)) {
+                        exercise.isCompleted = true;
+                        
+                        // 检查训练是否完成
+                        if (this.exercises.every(ex => ex.isCompleted)) {
+                            this.completeWorkout();
+                            return;
+                        }
+                    }
+                    
+                    // 开始休息（如果不是最后一组）
+                    const isLastSet = setIndex === exercise.sets.length - 1;
+                    const isLastExercise = exerciseIndex === this.exercises.length - 1;
+                    
+                    if (!isLastSet || !isLastExercise) {
+                        this.startRest(exercise.restTime);
+                        
+                        // 准备下一组
+                        if (setIndex + 1 < exercise.sets.length) {
+                            this.currentSetIndex = setIndex + 1;
+                        } else {
+                            // 移动到下一个动作的第一组
+                            this.currentExerciseIndex = exerciseIndex + 1;
+                            this.currentSetIndex = 0;
+                        }
+                    }
+                    
+                    // 保存进度
+                    this.updateSession();
+                },
+                
+                startRest(duration) {
+                    this.isResting = true;
+                    this.restTimeRemaining = duration;
+                    this.originalRestTime = duration;
+                    
+                    this.restTimer = setInterval(() => {
+                        this.restTimeRemaining--;
+                        
+                        if (this.restTimeRemaining <= 0) {
+                            this.endRest();
+                        }
+                        
+                        // 最后3秒震动提醒
+                        if (this.restTimeRemaining <= 3 && this.restTimeRemaining > 0) {
+                            this.vibrate();
+                        }
+                    }, 1000);
+                },
+                
+                endRest() {
+                    this.isResting = false;
+                    if (this.restTimer) {
+                        clearInterval(this.restTimer);
+                        this.restTimer = null;
+                    }
+                    this.vibrate(); // 休息结束震动提醒
+                },
+                
+                skipRest() {
+                    this.endRest();
+                },
+                
+                addRestTime() {
+                    this.restTimeRemaining += 30;
+                },
+                
+                completeWorkout() {
+                    this.isWorkoutCompleted = true;
+                    this.stopTimer();
+                    this.endRest();
+                    
+                    // 更新最终会话数据
+                    this.updateSession(true);
+                },
+                
+                async finishWorkout() {
+                    try {
+                        // 跳转回后台管理页面
+                        window.location.href = '/';
+                    } catch (error) {
+                        console.error('完成训练失败:', error);
+                    }
+                },
+                
+                async updateSession(isCompleted = false) {
+                    try {
+                        const sessionData = {
+                            ...this.currentSession,
+                            exercises: this.exercises.map(ex => ({
+                                exerciseId: ex.id,
+                                completedSets: ex.sets.filter(s => s.completed).length,
+                                completedReps: ex.sets.map(s => s.actualReps),
+                                actualRestTimes: ex.sets.map(s => s.actualRestTime),
+                                isCompleted: ex.isCompleted
+                            })),
+                            totalTime: this.totalTime,
+                            isCompleted: isCompleted
+                        };
+                        
+                        await axios.put(`/api/sessions/${this.currentSession.id}`, sessionData);
+                        
+                    } catch (error) {
+                        console.error('更新训练记录失败:', error);
+                    }
+                },
+                
+                vibrate() {
+                    // 浏览器震动API
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                    
+                    // 视觉震动效果
+                    document.body.classList.add('shake');
+                    setTimeout(() => {
+                        document.body.classList.remove('shake');
+                    }, 500);
+                },
+                
+                formatTime(seconds) {
+                    const minutes = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                },
+                
+                showWorkoutActions() {
+                    // 简化处理，显示暂停/继续
+                    if (this.isPaused) {
+                        this.resumeWorkout();
+                    } else {
+                        this.pauseWorkout();
+                    }
+                }
+            },
+            
+            async mounted() {
+                await this.loadWorkoutSession();
+                
+                // 防止页面刷新丢失数据
+                window.addEventListener('beforeunload', (e) => {
+                    if (this.isWorkoutStarted && !this.isWorkoutCompleted) {
+                        e.preventDefault();
+                        e.returnValue = '训练正在进行中，确定要离开吗？';
+                    }
+                });
+            },
+            
+            beforeUnmount() {
+                this.stopTimer();
+                this.endRest();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

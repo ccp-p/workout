@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身训练管理后台</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #fff;
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: #007aff;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f0f0f0;
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+        }
+
+        .btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #0056d3;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+        }
+
+        .btn-danger:hover {
+            background: #d70015;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .exercise-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+
+        .exercise-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .exercise-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-bodypart {
+            color: #8e8e93;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-description {
+            color: #48484a;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .workout-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .workout-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-set {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .file-upload {
+            border: 2px dashed #d1d1d6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .file-upload.dragover {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .exercise-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>健身训练管理后台</h1>
+        </div>
+
+        <div class="container">
+            <div class="tabs">
+                <div class="tab" :class="{active: activeTab === 'exercises'}" @click="activeTab = 'exercises'">
+                    动作管理
+                </div>
+                <div class="tab" :class="{active: activeTab === 'workouts'}" @click="activeTab = 'workouts'">
+                    训练计划
+                </div>
+                <div class="tab" :class="{active: activeTab === 'sessions'}" @click="activeTab = 'sessions'">
+                    训练记录
+                </div>
+                <div class="tab" :class="{active: activeTab === 'statistics'}" @click="activeTab = 'statistics'">
+                    数据统计
+                </div>
+            </div>
+
+            <!-- 动作管理 -->
+            <div v-show="activeTab === 'exercises'">
+                <div class="section">
+                    <h2>动作管理</h2>
+                    <button class="btn" @click="showAddExerciseModal = true">添加新动作</button>
+                </div>
+
+                <div class="exercise-grid">
+                    <div v-for="exercise in exercises" :key="exercise.id" class="exercise-card">
+                        <img v-if="exercise.imageUrl" :src="exercise.imageUrl" :alt="exercise.name" class="exercise-image">
+                        <div v-else class="exercise-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #8e8e93;">
+                            暂无图片
+                        </div>
+                        <div class="exercise-name">{{ exercise.name }}</div>
+                        <div class="exercise-bodypart">{{ exercise.bodyPart }}</div>
+                        <div class="exercise-description">{{ exercise.description }}</div>
+                        <div class="card-actions">
+                            <button class="btn" @click="editExercise(exercise)">编辑</button>
+                            <button class="btn btn-danger" @click="deleteExercise(exercise.id)">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练计划 -->
+            <div v-show="activeTab === 'workouts'">
+                <div class="section">
+                    <h2>训练计划</h2>
+                    <button class="btn" @click="showAddWorkoutModal = true">创建新计划</button>
+                </div>
+
+                <div v-for="workout in workouts" :key="workout.id" class="workout-item">
+                    <div class="workout-name">{{ workout.name }}</div>
+                    <div style="color: #8e8e93; margin-bottom: 1rem;">{{ workout.bodyPart }} - {{ workout.description }}</div>
+                    <div v-for="exercise in workout.exercises" :key="exercise.exerciseId" class="exercise-set">
+                        <span>{{ getExerciseName(exercise.exerciseId) }}</span>
+                        <span>{{ exercise.sets }}组 x {{ exercise.reps }}次</span>
+                        <span v-if="exercise.weight">{{ exercise.weight }}kg</span>
+                        <span>休息{{ exercise.restTime }}s</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn" @click="editWorkout(workout)">编辑</button>
+                        <button class="btn btn-danger" @click="deleteWorkout(workout.id)">删除</button>
+                        <button class="btn" @click="startWorkout(workout)">开始训练</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练记录 -->
+            <div v-show="activeTab === 'sessions'">
+                <div class="section">
+                    <h2>训练记录</h2>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="date" v-model="filterStartDate" class="form-control" style="width: auto;">
+                        <input type="date" v-model="filterEndDate" class="form-control" style="width: auto;">
+                        <button class="btn" @click="filterSessions">筛选</button>
+                    </div>
+                </div>
+
+                <div v-for="session in sessions" :key="session.id" class="workout-item">
+                    <div class="workout-name">{{ getWorkoutName(session.workoutId) }}</div>
+                    <div style="color: #8e8e93; margin-bottom: 1rem;">
+                        {{ formatDate(session.date) }} | 
+                        {{ formatTime(session.startTime) }} - {{ formatTime(session.endTime) }} |
+                        总时长: {{ formatDuration(session.totalTime) }}
+                    </div>
+                    <div v-if="session.isCompleted" style="color: #34c759; font-weight: 600;">✓ 已完成</div>
+                    <div v-else style="color: #ff9500; font-weight: 600;">进行中</div>
+                </div>
+            </div>
+
+            <!-- 数据统计 -->
+            <div v-show="activeTab === 'statistics'">
+                <div class="section">
+                    <h2>数据统计</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.todayStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">今日训练次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.todayStats?.totalTime || '0s' }}</div>
+                        <div class="stat-label">今日训练时长</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.weekStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">本周训练次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ statistics.monthStats?.workoutCount || 0 }}</div>
+                        <div class="stat-label">本月训练次数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑动作模态框 -->
+        <div v-if="showAddExerciseModal || showEditExerciseModal" class="modal" @click.self="closeExerciseModal">
+            <div class="modal-content">
+                <h2>{{ showEditExerciseModal ? '编辑动作' : '添加新动作' }}</h2>
+                
+                <div class="form-group">
+                    <label>动作名称</label>
+                    <input type="text" v-model="exerciseForm.name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>身体部位</label>
+                    <select v-model="exerciseForm.bodyPart" class="form-control">
+                        <option value="">请选择</option>
+                        <option value="胸部">胸部</option>
+                        <option value="背部">背部</option>
+                        <option value="腿部">腿部</option>
+                        <option value="肩部">肩部</option>
+                        <option value="手臂">手臂</option>
+                        <option value="腹部">腹部</option>
+                        <option value="全身">全身</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>动作描述</label>
+                    <textarea v-model="exerciseForm.description" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>动作图片/GIF</label>
+                    <div class="file-upload" @click="$refs.fileInput.click()" 
+                         @dragover.prevent="onDragOver" 
+                         @dragleave.prevent="onDragLeave" 
+                         @drop.prevent="onDrop">
+                        <div v-if="exerciseForm.imageUrl">
+                            <img :src="exerciseForm.imageUrl" style="max-width: 200px; max-height: 200px;">
+                            <p>点击或拖拽更换图片</p>
+                        </div>
+                        <div v-else>
+                            <p>点击选择或拖拽文件到此处上传</p>
+                            <p style="color: #8e8e93; font-size: 0.9rem;">支持 JPG, PNG, GIF 格式</p>
+                        </div>
+                    </div>
+                    <input ref="fileInput" type="file" @change="onFileSelect" accept="image/*" class="hidden">
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn" style="background: #8e8e93;" @click="closeExerciseModal">取消</button>
+                    <button class="btn" @click="saveExercise">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑训练计划模态框 -->
+        <div v-if="showAddWorkoutModal || showEditWorkoutModal" class="modal" @click.self="closeWorkoutModal">
+            <div class="modal-content">
+                <h2>{{ showEditWorkoutModal ? '编辑训练计划' : '创建新训练计划' }}</h2>
+                
+                <div class="form-group">
+                    <label>计划名称</label>
+                    <input type="text" v-model="workoutForm.name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>目标部位</label>
+                    <select v-model="workoutForm.bodyPart" class="form-control">
+                        <option value="">请选择</option>
+                        <option value="胸部">胸部</option>
+                        <option value="背部">背部</option>
+                        <option value="腿部">腿部</option>
+                        <option value="肩部">肩部</option>
+                        <option value="手臂">手臂</option>
+                        <option value="腹部">腹部</option>
+                        <option value="全身">全身</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>计划描述</label>
+                    <textarea v-model="workoutForm.description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>训练动作</label>
+                    <div v-for="(exercise, index) in workoutForm.exercises" :key="index" class="exercise-set">
+                        <select v-model="exercise.exerciseId" class="form-control" style="width: auto;">
+                            <option value="">选择动作</option>
+                            <option v-for="ex in exercises" :key="ex.id" :value="ex.id">{{ ex.name }}</option>
+                        </select>
+                        <input type="number" v-model="exercise.sets" placeholder="组数" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.reps" placeholder="次数" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.weight" placeholder="重量" class="form-control" style="width: 80px;">
+                        <input type="number" v-model="exercise.restTime" placeholder="休息(秒)" class="form-control" style="width: 100px;">
+                        <button class="btn btn-danger" @click="removeExerciseFromWorkout(index)">删除</button>
+                    </div>
+                    <button class="btn" @click="addExerciseToWorkout">添加动作</button>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn" style="background: #8e8e93;" @click="closeWorkoutModal">取消</button>
+                    <button class="btn" @click="saveWorkout">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'exercises',
+                    exercises: [],
+                    workouts: [],
+                    sessions: [],
+                    statistics: {},
+                    
+                    // 模态框状态
+                    showAddExerciseModal: false,
+                    showEditExerciseModal: false,
+                    showAddWorkoutModal: false,
+                    showEditWorkoutModal: false,
+                    
+                    // 表单数据
+                    exerciseForm: {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        imageUrl: ''
+                    },
+                    workoutForm: {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        exercises: []
+                    },
+                    
+                    // 筛选
+                    filterStartDate: '',
+                    filterEndDate: ''
+                }
+            },
+            
+            methods: {
+                async loadExercises() {
+                    try {
+                        const response = await axios.get('/api/exercises');
+                        this.exercises = response.data || [];
+                    } catch (error) {
+                        console.error('加载动作失败:', error);
+                    }
+                },
+                
+                async loadWorkouts() {
+                    try {
+                        const response = await axios.get('/api/workouts');
+                        this.workouts = response.data || [];
+                    } catch (error) {
+                        console.error('加载训练计划失败:', error);
+                    }
+                },
+                
+                async loadSessions() {
+                    try {
+                        const response = await axios.get('/api/sessions');
+                        this.sessions = response.data || [];
+                    } catch (error) {
+                        console.error('加载训练记录失败:', error);
+                    }
+                },
+                
+                async loadStatistics() {
+                    try {
+                        const response = await axios.get('/api/statistics');
+                        this.statistics = response.data || {};
+                    } catch (error) {
+                        console.error('加载统计数据失败:', error);
+                    }
+                },
+                
+                // 动作相关方法
+                editExercise(exercise) {
+                    this.exerciseForm = { ...exercise };
+                    this.showEditExerciseModal = true;
+                },
+                
+                async deleteExercise(id) {
+                    if (confirm('确定要删除这个动作吗？')) {
+                        try {
+                            await axios.delete(`/api/exercises/${id}`);
+                            await this.loadExercises();
+                        } catch (error) {
+                            alert('删除失败: ' + error.response?.data?.error);
+                        }
+                    }
+                },
+                
+                async saveExercise() {
+                    try {
+                        if (this.showEditExerciseModal) {
+                            await axios.put(`/api/exercises/${this.exerciseForm.id}`, this.exerciseForm);
+                        } else {
+                            await axios.post('/api/exercises', this.exerciseForm);
+                        }
+                        await this.loadExercises();
+                        this.closeExerciseModal();
+                    } catch (error) {
+                        alert('保存失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                closeExerciseModal() {
+                    this.showAddExerciseModal = false;
+                    this.showEditExerciseModal = false;
+                    this.exerciseForm = {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        imageUrl: ''
+                    };
+                },
+                
+                // 训练计划相关方法
+                editWorkout(workout) {
+                    this.workoutForm = { ...workout };
+                    this.showEditWorkoutModal = true;
+                },
+                
+                async deleteWorkout(id) {
+                    if (confirm('确定要删除这个训练计划吗？')) {
+                        try {
+                            await axios.delete(`/api/workouts/${id}`);
+                            await this.loadWorkouts();
+                        } catch (error) {
+                            alert('删除失败: ' + error.response?.data?.error);
+                        }
+                    }
+                },
+                
+                async saveWorkout() {
+                    try {
+                        if (this.showEditWorkoutModal) {
+                            await axios.put(`/api/workouts/${this.workoutForm.id}`, this.workoutForm);
+                        } else {
+                            await axios.post('/api/workouts', this.workoutForm);
+                        }
+                        await this.loadWorkouts();
+                        this.closeWorkoutModal();
+                    } catch (error) {
+                        alert('保存失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                closeWorkoutModal() {
+                    this.showAddWorkoutModal = false;
+                    this.showEditWorkoutModal = false;
+                    this.workoutForm = {
+                        id: '',
+                        name: '',
+                        description: '',
+                        bodyPart: '',
+                        exercises: []
+                    };
+                },
+                
+                addExerciseToWorkout() {
+                    this.workoutForm.exercises.push({
+                        exerciseId: '',
+                        sets: 4,
+                        reps: 12,
+                        weight: 0,
+                        restTime: 60
+                    });
+                },
+                
+                removeExerciseFromWorkout(index) {
+                    this.workoutForm.exercises.splice(index, 1);
+                },
+                
+                async startWorkout(workout) {
+                    try {
+                        const session = {
+                            workoutId: workout.id,
+                            exercises: workout.exercises.map(ex => ({
+                                exerciseId: ex.exerciseId,
+                                completedSets: 0,
+                                completedReps: [],
+                                actualRestTimes: [],
+                                isCompleted: false
+                            })),
+                            isCompleted: false
+                        };
+                        
+                        const response = await axios.post('/api/sessions', session);
+                        const sessionId = response.data.id;
+                        
+                        // 跳转到移动端训练页面
+                        window.open(`/mobile?session=${sessionId}`, '_blank');
+                    } catch (error) {
+                        alert('启动训练失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                // 文件上传相关方法
+                async onFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        await this.uploadFile(file);
+                    }
+                },
+                
+                onDragOver(event) {
+                    event.dataTransfer.dropEffect = 'copy';
+                    event.target.classList.add('dragover');
+                },
+                
+                onDragLeave(event) {
+                    event.target.classList.remove('dragover');
+                },
+                
+                async onDrop(event) {
+                    event.target.classList.remove('dragover');
+                    const file = event.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        await this.uploadFile(file);
+                    }
+                },
+                
+                async uploadFile(file) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await axios.post('/api/upload', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+                        
+                        this.exerciseForm.imageUrl = response.data.url;
+                    } catch (error) {
+                        alert('文件上传失败: ' + error.response?.data?.error);
+                    }
+                },
+                
+                // 工具方法
+                getExerciseName(exerciseId) {
+                    const exercise = this.exercises.find(ex => ex.id === exerciseId);
+                    return exercise ? exercise.name : '未知动作';
+                },
+                
+                getWorkoutName(workoutId) {
+                    const workout = this.workouts.find(w => w.id === workoutId);
+                    return workout ? workout.name : '未知计划';
+                },
+                
+                formatDate(dateString) {
+                    return new Date(dateString).toLocaleDateString('zh-CN');
+                },
+                
+                formatTime(timeString) {
+                    return new Date(timeString).toLocaleTimeString('zh-CN');
+                },
+                
+                formatDuration(seconds) {
+                    if (!seconds) return '0s';
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = seconds % 60;
+                    
+                    if (hours > 0) {
+                        return `${hours}h ${minutes}m ${secs}s`;
+                    } else if (minutes > 0) {
+                        return `${minutes}m ${secs}s`;
+                    }
+                    return `${secs}s`;
+                },
+                
+                async filterSessions() {
+                    try {
+                        let url = '/api/sessions';
+                        if (this.filterStartDate && this.filterEndDate) {
+                            url += `?start=${this.filterStartDate}&end=${this.filterEndDate}`;
+                        }
+                        const response = await axios.get(url);
+                        this.sessions = response.data || [];
+                    } catch (error) {
+                        console.error('筛选训练记录失败:', error);
+                    }
+                }
+            },
+            
+            async mounted() {
+                await this.loadExercises();
+                await this.loadWorkouts();
+                await this.loadSessions();
+                await this.loadStatistics();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
